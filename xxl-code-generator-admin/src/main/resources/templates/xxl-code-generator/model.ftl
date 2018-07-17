@@ -28,8 +28,8 @@ import io.swagger.annotations.ApiModelProperty;
 *  Created by cipher on '${.now?string('yyyy-MM-dd HH:mm:ss')}'.
 */
 @Table(name = "${classInfo.tableName}")
-@ApiModel(value = "${classInfo.className}", description = "${classInfo.classComment}")
-public class ${classInfo.className} extends Base {
+@ApiModel(value = "${classInfo.className}Model", description = "${classInfo.classComment}")
+public class ${classInfo.className}Model extends Base {
 
     private static final long serialVersionUID = 1L;
 

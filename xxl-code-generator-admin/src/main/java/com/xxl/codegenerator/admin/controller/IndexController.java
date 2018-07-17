@@ -2,18 +2,25 @@ package com.xxl.codegenerator.admin.controller;
 
 import com.xxl.codegenerator.admin.core.CodeGeneratorTool;
 import com.xxl.codegenerator.admin.core.model.ClassInfo;
+import com.xxl.codegenerator.admin.core.util.FileUtils;
 import com.xxl.codegenerator.admin.model.ReturnT;
 import com.xxl.codegenerator.admin.util.FreemarkerTool;
 import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +35,43 @@ public class IndexController {
 
     @Resource
     private FreemarkerTool freemarkerTool;
+
+    @RequestMapping("/download")
+    public ResponseEntity<FileSystemResource> download(String tableSql, String key) {
+        try {
+            if (StringUtils.isBlank(tableSql) || StringUtils.isBlank(key)) {
+                return null;
+            }
+            ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(tableSql);
+            Map<String, Object> params = new HashMap<>();
+            params.put("classInfo", classInfo);
+            String templateName = MessageFormat.format("xxl-code-generator/{0}.ftl", key);
+            String content = freemarkerTool.processString(templateName, params);
+            String folder = System.getProperty("java.io.tmpdir");
+            String fileName = com.xxl.codegenerator.admin.core.util.StringUtils.underlineToCamelCase(key);
+            fileName = com.xxl.codegenerator.admin.core.util.StringUtils.upperCaseFirst(fileName);
+            fileName = classInfo.getClassName() + fileName;
+            String filePath = folder + File.separator + fileName + ".java";
+            FileUtils.writeFile(content, filePath);
+            File file = new File(filePath);
+            if (file.exists()) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+                headers.add("Content-Disposition", "attachment; filename=" + fileName + ".java");
+                headers.add("Pragma", "no-cache");
+                headers.add("Expires", "0");
+                return ResponseEntity
+                        .ok()
+                        .headers(headers)
+                        .contentLength(file.length())
+                        .contentType(MediaType.parseMediaType("application/octet-stream"))
+                        .body(new FileSystemResource(file));
+            }
+        } catch (IOException | TemplateException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
 
     @RequestMapping("/")
     public String index() {
@@ -64,7 +108,7 @@ public class IndexController {
 
             // 计算,生成代码行数
             int lineNum = 0;
-            for (Map.Entry<String, String> item: result.entrySet()) {
+            for (Map.Entry<String, String> item : result.entrySet()) {
                 if (item.getValue() != null) {
                     lineNum += StringUtils.countMatches(item.getValue(), "\n");
                 }

@@ -1,6 +1,19 @@
 $(function () {
 
     /**
+    * 下载代码
+    */
+    $(".download-code").click(function() {
+        var tableSql = tableSqlIDE.getValue();
+        var key = $(this).parent().attr("href").substring(1);
+        var url = base_url + "/download";
+        var form = $("<form></form>").attr("action", url).attr("method", "post");
+        form.append($("<input></input>").attr("type", "hidden").attr("name", "tableSql").attr("value", tableSql));
+        form.append($("<input></input>").attr("type", "hidden").attr("name", "key").attr("value", key));
+        form.appendTo('body').submit().remove();
+    });
+
+    /**
      * 初始化 table sql
      */
     var tableSqlIDE;
@@ -103,6 +116,18 @@ $(function () {
 
     initCodeArea();
 
+    function showCode($div, ide, data) {
+        var hasClass = $div.hasClass("active");
+        if (!hasClass) {
+            $div.addClass("active");
+        }
+        ide.setValue(data);
+        ide.setSize('auto','auto');
+        if (!hasClass) {
+            $div.removeClass("active");
+        }
+    }
+
     /**
      * 生成代码
      */
@@ -123,25 +148,12 @@ $(function () {
                         icon: '1',
                         content: "代码生成成功" ,
                         end: function(layero, index){
-
-                            controller_ide.setValue(data.data.controller_code);
-                            controller_ide.setSize('auto','auto');
-
-                            service_ide.setValue(data.data.service_code);
-                            service_ide.setSize('auto','auto');
-
-                            service_impl_ide.setValue(data.data.service_impl_code);
-                            service_impl_ide.setSize('auto','auto');
-
-                            dao_ide.setValue(data.data.dao_code);
-                            dao_ide.setSize('auto','auto');
-
-                            mybatis_ide.setValue(data.data.mybatis_code);
-                            mybatis_ide.setSize('auto','auto');
-
-                            model_ide.setValue(data.data.model_code);
-                            model_ide.setSize('auto','auto');
-
+                            showCode($("#model"), model_ide, data.data.model_code);
+                            showCode($("#controller"), controller_ide, data.data.controller_code);
+                            showCode($("#service"), service_ide, data.data.service_code);
+                            showCode($("#service_impl"), service_impl_ide, data.data.service_impl_code);
+                            showCode($("#dao"), dao_ide, data.data.dao_code);
+                            showCode($("#mybatis"), mybatis_ide, data.data.mybatis_code);
                         }
                     });
                 } else {

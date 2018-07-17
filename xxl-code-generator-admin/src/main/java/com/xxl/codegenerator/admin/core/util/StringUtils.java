@@ -1,5 +1,8 @@
 package com.xxl.codegenerator.admin.core.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * string tool
  *
