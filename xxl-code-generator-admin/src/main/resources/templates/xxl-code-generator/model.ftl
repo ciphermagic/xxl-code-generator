@@ -61,4 +61,31 @@ public class ${classInfo.className}Model extends Base {
 
 </#list>
 </#if>
+
+	public static class Builder {
+	
+		public Builder() {
+        }
+		
+		private ${classInfo.className}Model po = new ${classInfo.className}Model();
+		
+		
+		<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
+		<#list classInfo.fieldList as fieldItem>
+			public Builder ${fieldItem.fieldName}(${fieldItem.fieldClass} ${fieldItem.fieldName}) {
+				po.set${fieldItem.fieldName?cap_first}(${fieldItem.fieldName});
+				return this;
+			}
+		</#list>
+		</#if>
+		
+		public $!{pascalName}PO build() {
+            return po;
+        }
+	
+	}
+	
+	public static Builder builder() {
+        return new Builder();
+    }
 }
