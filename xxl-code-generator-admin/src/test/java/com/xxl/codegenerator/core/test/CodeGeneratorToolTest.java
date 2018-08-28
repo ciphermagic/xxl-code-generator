@@ -33,7 +33,7 @@ public class CodeGeneratorToolTest {
 
         // code generate
         ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(tableSql);
-
+        System.out.println(classInfo);
     }
 
 }

@@ -14,12 +14,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +35,21 @@ public class IndexController {
 
     @Resource
     private FreemarkerTool freemarkerTool;
+
+    @RequestMapping("/get/{type}")
+    @ResponseBody
+    public ReturnT<Map<String, String>> getTemplate(@PathVariable("type") String type) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            String path = Thread.currentThread().getContextClassLoader().getResource("templates").getPath();
+            path += File.separator + "xxl-code-generator" + File.separator + type + ".ftl";
+            String content = FileUtils.readFile(path);
+            map.put("content", content);
+        } catch (Exception e) {
+            logger.error(e + "");
+        }
+        return new ReturnT<>(map);
+    }
 
     @RequestMapping("/download")
     public ResponseEntity<FileSystemResource> download(String tableSql, String key) {
@@ -81,31 +96,23 @@ public class IndexController {
     @RequestMapping("/codeGenerate")
     @ResponseBody
     public ReturnT<Map<String, String>> codeGenerate(String tableSql) {
-
         try {
-
             if (StringUtils.isBlank(tableSql)) {
                 return new ReturnT<Map<String, String>>(ReturnT.FAIL_CODE, "表结构信息不可为空");
             }
-
             // parse table
             ClassInfo classInfo = CodeGeneratorTool.processTableIntoClassInfo(tableSql);
-
             // code genarete
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("classInfo", classInfo);
-
             // result
             Map<String, String> result = new HashMap<String, String>();
-
             result.put("controller_code", freemarkerTool.processString("xxl-code-generator/controller.ftl", params));
             result.put("service_code", freemarkerTool.processString("xxl-code-generator/service.ftl", params));
             result.put("service_impl_code", freemarkerTool.processString("xxl-code-generator/service_impl.ftl", params));
-
             result.put("dao_code", freemarkerTool.processString("xxl-code-generator/dao.ftl", params));
             result.put("mybatis_code", freemarkerTool.processString("xxl-code-generator/mybatis.ftl", params));
             result.put("model_code", freemarkerTool.processString("xxl-code-generator/model.ftl", params));
-
             // 计算,生成代码行数
             int lineNum = 0;
             for (Map.Entry<String, String> item : result.entrySet()) {
@@ -114,13 +121,11 @@ public class IndexController {
                 }
             }
             logger.info("生成代码行数：{}", lineNum);
-
             return new ReturnT<Map<String, String>>(result);
         } catch (IOException | TemplateException e) {
             logger.error(e.getMessage(), e);
             return new ReturnT<Map<String, String>>(ReturnT.FAIL_CODE, "表结构解析失败");
         }
-
     }
 
 }
