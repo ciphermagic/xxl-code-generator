@@ -18,7 +18,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 </#if>
-import com.tupperware.pos.domain.common.Base;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -28,10 +27,8 @@ import io.swagger.annotations.ApiModelProperty;
 *  Created by cipher on '${.now?string('yyyy-MM-dd HH:mm:ss')}'.
 */
 @Table(name = "${classInfo.tableName}")
-@ApiModel(value = "${classInfo.className}Model", description = "${classInfo.classComment}")
-public class ${classInfo.className}Model extends Base {
-
-    private static final long serialVersionUID = 1L;
+@ApiModel(value = "${classInfo.className}PO", description = "${classInfo.classComment}")
+public class ${classInfo.className}PO {
 
 <#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
 <#list classInfo.fieldList as fieldItem >
@@ -63,30 +60,29 @@ public class ${classInfo.className}Model extends Base {
 </#if>
 
 	public static class Builder {
-	
+
 		public Builder() {
 		}
-		
-		private ${classInfo.className}Model po = new ${classInfo.className}Model();
-		
+
+		private ${classInfo.className}PO po = new ${classInfo.className}PO();
+
 		<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
 		<#list classInfo.fieldList as fieldItem>
 		public Builder ${fieldItem.fieldName}(${fieldItem.fieldClass} ${fieldItem.fieldName}) {
 			po.set${fieldItem.fieldName?cap_first}(${fieldItem.fieldName});
 			return this;
 		}
-			
 		</#list>
 		</#if>
-		
-		public ${classInfo.className}Model build() {
+
+		public ${classInfo.className}PO build() {
 			return po;
 		}
-	
+
 	}
-	
+
 	public static Builder builder() {
 		return new Builder();
 	}
-	
+
 }
