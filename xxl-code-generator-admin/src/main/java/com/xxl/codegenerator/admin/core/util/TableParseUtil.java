@@ -101,7 +101,7 @@ public class TableParseUtil {
                     // field class
                     columnLine = columnLine.substring(columnLine.indexOf("`") + 1).trim();    // int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
                     String fieldClass = Object.class.getSimpleName();
-                    if (columnLine.startsWith("int") || columnLine.startsWith("tinyint") || columnLine.startsWith("smallint")) {
+                    if (columnLine.startsWith("int") || columnLine.startsWith("tinyint") || columnLine.startsWith("smallint") || columnLine.startsWith("bit")) {
                         fieldClass = Integer.class.getSimpleName();
                     } else if (columnLine.startsWith("bigint")) {
                         fieldClass = Long.class.getSimpleName();
@@ -109,7 +109,7 @@ public class TableParseUtil {
                         fieldClass = Float.class.getSimpleName();
                     } else if (columnLine.startsWith("double")) {
                         fieldClass = Double.class.getSimpleName();
-                    } else if (columnLine.startsWith("datetime") || columnLine.startsWith("timestamp")) {
+                    } else if (columnLine.startsWith("datetime") || columnLine.startsWith("timestamp") || columnLine.startsWith("date")) {
                         fieldClass = Timestamp.class.getSimpleName();
                     } else if (columnLine.startsWith("varchar") || columnLine.startsWith("text")) {
                         fieldClass = String.class.getSimpleName();
@@ -131,7 +131,7 @@ public class TableParseUtil {
                     fieldInfo.setColumnName(columnName);
                     fieldInfo.setFieldName(fieldName);
                     fieldInfo.setFieldClass(fieldClass);
-                    fieldInfo.setFieldComment(fieldComment);
+                    fieldInfo.setFieldComment(org.springframework.util.StringUtils.isEmpty(fieldComment) ? "" : fieldComment);
 
                     fieldList.add(fieldInfo);
                 }
@@ -145,7 +145,7 @@ public class TableParseUtil {
         ClassInfo codeJavaInfo = new ClassInfo();
         codeJavaInfo.setTableName(tableName);
         codeJavaInfo.setClassName(className);
-        codeJavaInfo.setClassComment(classComment);
+        codeJavaInfo.setClassComment(org.springframework.util.StringUtils.isEmpty(classComment) ? "" : classComment);
         codeJavaInfo.setFieldList(fieldList);
 
         return codeJavaInfo;

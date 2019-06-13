@@ -36,7 +36,7 @@ public class ${classInfo.className}PO {
     @Id
     @GeneratedValue(generator = "JDBC")
     @ApiModelProperty("${fieldItem.fieldComment}")
-    private Long id;
+    private ${fieldItem.fieldClass} id;
 
     </#if>
     <#if fieldItem.columnName != "id" >
