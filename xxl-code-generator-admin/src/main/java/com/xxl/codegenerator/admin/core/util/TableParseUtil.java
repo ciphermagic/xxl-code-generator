@@ -109,8 +109,10 @@ public class TableParseUtil {
                         fieldClass = Float.class.getSimpleName();
                     } else if (columnLine.startsWith("double")) {
                         fieldClass = Double.class.getSimpleName();
-                    } else if (columnLine.startsWith("datetime") || columnLine.startsWith("timestamp") || columnLine.startsWith("date")) {
+                    } else if (columnLine.startsWith("datetime") || columnLine.startsWith("timestamp")) {
                         fieldClass = Timestamp.class.getSimpleName();
+                    } else if (columnLine.startsWith("date")) {
+                        fieldClass = Date.class.getSimpleName();
                     } else if (columnLine.startsWith("varchar") || columnLine.startsWith("text")) {
                         fieldClass = String.class.getSimpleName();
                     } else if (columnLine.startsWith("decimal")) {

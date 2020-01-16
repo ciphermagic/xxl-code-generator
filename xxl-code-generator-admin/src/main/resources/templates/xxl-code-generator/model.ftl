@@ -1,8 +1,12 @@
+<#assign importDateTime = false />
 <#assign importDate = false />
 <#assign importId = false />
 <#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
     <#list classInfo.fieldList as fieldItem >
         <#if fieldItem.fieldClass == "Timestamp">
+            <#assign importDateTime = true />
+        </#if>
+        <#if fieldItem.fieldClass == "Date">
             <#assign importDate = true />
         </#if>
         <#if fieldItem.columnName == "id">
@@ -10,8 +14,11 @@
         </#if>
     </#list>
 </#if>
-<#if importDate>
+<#if importDateTime>
 import java.sql.Timestamp;
+</#if>
+<#if importDate>
+import java.util.Date;
 </#if>
 <#if importId>
 import javax.persistence.GeneratedValue;
@@ -59,24 +66,36 @@ public class ${classInfo.className}PO {
 </#list>
 </#if>
 
+	private ${classInfo.className}PO(Builder builder) {
+<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
+<#list classInfo.fieldList as fieldItem>
+		this.${fieldItem.fieldName} = builder.${fieldItem.fieldName};
+</#list>
+</#if>
+	}
+
 	public static class Builder {
+
+<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
+<#list classInfo.fieldList as fieldItem >
+		private ${fieldItem.fieldClass} ${fieldItem.fieldName};
+</#list>
+</#if>
 
 		public Builder() {
 		}
 
-		private ${classInfo.className}PO po = new ${classInfo.className}PO();
-
 		<#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
 		<#list classInfo.fieldList as fieldItem>
 		public Builder ${fieldItem.fieldName}(${fieldItem.fieldClass} ${fieldItem.fieldName}) {
-			po.set${fieldItem.fieldName?cap_first}(${fieldItem.fieldName});
+		    this.${fieldItem.fieldName} = ${fieldItem.fieldName};
 			return this;
 		}
 		</#list>
 		</#if>
 
 		public ${classInfo.className}PO build() {
-			return po;
+			return new ${classInfo.className}PO(this);
 		}
 
 	}
