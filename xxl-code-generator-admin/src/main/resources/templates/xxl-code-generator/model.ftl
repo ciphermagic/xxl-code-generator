@@ -66,6 +66,9 @@ public class ${classInfo.className}PO {
 </#list>
 </#if>
 
+    private ${classInfo.className}PO() {
+    }
+
 	private ${classInfo.className}PO(Builder builder) {
 <#if classInfo.fieldList?exists && classInfo.fieldList?size gt 0>
 <#list classInfo.fieldList as fieldItem>
